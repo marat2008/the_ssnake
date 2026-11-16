@@ -19,10 +19,10 @@ LEFT = (-1, 0)
 RIGHT = (1, 0)
 
 # Цветовая гамма (RGB)
-BOARD_BACKGROUND_COLOR = (0, 0, 0)      # Фон игрового поля — черный
-BORDER_COLOR = (93, 216, 228)           # Цвет границ ячеек
-APPLE_COLOR = (255, 0, 0)               # Красное яблоко
-SNAKE_COLOR = (0, 255, 0)               # Зеленая змейка
+BOARD_BACKGROUND_COLOR = (0, 0, 0)
+BORDER_COLOR = (93, 216, 228)
+APPLE_COLOR = (255, 0, 0)
+SNAKE_COLOR = (0, 255, 0)
 
 # Скорость игры (количество кадров в секунду)
 SPEED = 20
@@ -50,7 +50,9 @@ class Apple(GameObject):
 
     def __init__(self, occupied_positions=None):
         super().__init__(APPLE_COLOR)
-        self.randomize_position(occupied_positions if occupied_positions else [])
+        self.randomize_position(
+            occupied_positions if occupied_positions else []
+        )
 
     def randomize_position(self, occupied_positions):
         """Устанавливает случайные координаты яблока, не занятые змейкой."""
@@ -100,7 +102,6 @@ class Snake(GameObject):
         head_x, head_y = self.get_head_position()
         dir_x, dir_y = self.direction
 
-        # Проход сквозь стены (телепортация на противоположную сторону)
         new_x = (head_x + dir_x * GRID_SIZE) % SCREEN_WIDTH
         new_y = (head_y + dir_y * GRID_SIZE) % SCREEN_HEIGHT
         new_head = (new_x, new_y)
@@ -113,12 +114,10 @@ class Snake(GameObject):
 
     def draw(self):
         """Отрисовка змейки на экране и затирание последнего сегмента."""
-        # Затирание хвоста
         if self.last:
             last_rect = pygame.Rect(self.last, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, BOARD_BACKGROUND_COLOR, last_rect)
 
-        # Отрисовка головы
         for position in self.positions:
             rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
             pygame.draw.rect(screen, self.body_color, rect)
@@ -156,16 +155,13 @@ def main():
         snake.update_direction()
         snake.move()
 
-        # Проверка поедания яблока
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake.positions)
-        # Проверка самопересечения
         elif snake.get_head_position() in snake.positions[1:]:
             snake.reset()
             screen.fill(BOARD_BACKGROUND_COLOR)
 
-        # Отрисовка игрового поля и объектов
         apple.draw()
         snake.draw()
         pygame.display.update()
